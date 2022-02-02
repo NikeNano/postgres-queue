@@ -1,0 +1,11 @@
+ version: v1
+ plugins:
+
+  - name: go
+    out: gen/proto/go
+    opt: paths=proto/queue/v1/queue.proto
+  - name: go-grpc
+    out: gen/proto/go
+    opt:
+      - paths=proto/queue/v1/queue.proto
+      - require_unimplemented_servers=false
