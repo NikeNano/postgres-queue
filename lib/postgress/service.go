@@ -1,5 +1,9 @@
 package postgress
 
+import (
+	"database/sql"
+)
+
 type Service interface {
 	DeQueue(int) ([]QueueValue, error)
 	Queue(QueueValue) error
@@ -11,22 +15,14 @@ type QueueValue struct {
 }
 
 type service struct {
-	host     string
-	port     int
-	user     string
-	password string
-	dbname   string
+	db *sql.DB
 }
 
 var _ Service = &service{}
 
-func NewService(host string, port int, user string, password string, dbname string) Service {
+func NewService(db *sql.DB) Service {
 	return &service{
-		host:     host,
-		port:     port,
-		user:     user,
-		password: password,
-		dbname:   dbname,
+		db: db,
 	}
 }
 
