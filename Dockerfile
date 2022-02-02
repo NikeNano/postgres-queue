@@ -7,9 +7,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -o server ./server/
 #https://medium.com/analytics-vidhya/grpc-service-with-docker-c584e93343c0
 # generate clean, final image for end users
 FROM alpine:3.11.3
+#FROM ubuntu:latest
 WORKDIR /root/
 COPY --from=builder $GOPATH/go/src/github.com/NikeNano/postrgres-queue/server/server .
-RUN ls /root/server
-EXPOSE 8080
-ENTRYPOINT ["/root/server"]
-##ENTRYPOINT ["bash", "-c", "/root/server"]
+CMD ["./server"]
