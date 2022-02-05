@@ -8,3 +8,4 @@ Implementing a queue in native Postgres with a thin go grpc wrapper around it.
 - https://docs.buf.build/tour/implement-grpc-endpoints
 - https://stackoverflow.com/questions/43911793/cannot-connect-to-go-grpc-server-running-in-local-docker-container
 - https://www.calhoun.io/connecting-to-a-postgresql-database-with-gos-database-sql-package/
+- https://github.com/pahanini/go-grpc-bidirectional-streaming-example
