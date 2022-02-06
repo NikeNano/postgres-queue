@@ -3,48 +3,11 @@ package postgress
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"os"
 	"testing"
 
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 )
-
-func getdb() (*sql.DB, error) {
-	host, ok := os.LookupEnv("HOST")
-	if !ok {
-		return nil, fmt.Errorf("missing HOST env")
-	}
-	port, ok := os.LookupEnv("PORT")
-	if !ok {
-		return nil, fmt.Errorf("missing PORT env")
-
-	}
-
-	user, ok := os.LookupEnv("USER")
-	if !ok {
-		return nil, fmt.Errorf("missing USER env")
-
-	}
-
-	password, ok := os.LookupEnv("PASSWORD")
-	if !ok {
-		return nil, fmt.Errorf("missing PASSWORD env")
-
-	}
-
-	dbname, ok := os.LookupEnv("DBNAME")
-	if !ok {
-		return nil, fmt.Errorf("missing DBNAME env")
-
-	}
-
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	return sql.Open("postgres", psqlInfo)
-}
 
 func dbCleanUp(db *sql.DB) error {
 	_, err := db.Exec("DELETE FROM events")
@@ -52,7 +15,7 @@ func dbCleanUp(db *sql.DB) error {
 }
 
 func TestDbConnection(t *testing.T) {
-	db, err := getdb()
+	db, err := Getdb()
 	require.NoError(t, err)
 	err = dbCleanUp(db)
 	require.NoError(t, err)
@@ -64,7 +27,7 @@ func TestDbConnection(t *testing.T) {
 }
 
 func TestEnqueue(t *testing.T) {
-	db, err := getdb()
+	db, err := Getdb()
 	require.NoError(t, err)
 	err = dbCleanUp(db)
 	require.NoError(t, err)
@@ -76,7 +39,7 @@ func TestEnqueue(t *testing.T) {
 }
 
 func TestDeQueue(t *testing.T) {
-	db, err := getdb()
+	db, err := Getdb()
 	require.NoError(t, err)
 	err = dbCleanUp(db)
 	require.NoError(t, err)
@@ -92,7 +55,7 @@ func TestDeQueue(t *testing.T) {
 }
 
 func TestDeQueueLock(t *testing.T) {
-	db, err := getdb()
+	db, err := Getdb()
 	require.NoError(t, err)
 	err = dbCleanUp(db)
 	require.NoError(t, err)
@@ -108,7 +71,7 @@ func TestDeQueueLock(t *testing.T) {
 }
 
 func TestDeQueueLockTx(t *testing.T) {
-	db, err := getdb()
+	db, err := Getdb()
 	dbCleanUp(db)
 	require.NoError(t, err)
 	dbsvc := NewService(db)
@@ -151,7 +114,7 @@ func TestDeQueueLockTx(t *testing.T) {
 }
 
 func TestDeQueueLockTxTwo(t *testing.T) {
-	db, err := getdb()
+	db, err := Getdb()
 	dbCleanUp(db)
 	require.NoError(t, err)
 	dbsvc := NewService(db)
@@ -186,7 +149,7 @@ func TestDeQueueLockTxTwo(t *testing.T) {
 }
 
 func TestDeQueueLockTxLock(t *testing.T) {
-	db, err := getdb()
+	db, err := Getdb()
 	dbCleanUp(db)
 	require.NoError(t, err)
 	dbsvc := NewService(db)

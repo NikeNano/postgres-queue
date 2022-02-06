@@ -4,8 +4,10 @@ database := postgres
 port := 5432
 host := 0.0.0.0
 
+
+
 gen: 
-	bug generate
+	buf generate
 
 postgres: 
 	docker run --rm -d --name postgres -p 5432:5432 -e POSTGRES_USER=$(postgres_user) -e POSTGRES_PASSWORD=$(password) -e POSTGRES_DB=$(database) postgres:13
@@ -20,4 +22,4 @@ test:
 	(HOST=$(host) PORT=$(port) USER=$(postgres_user) PASSWORD=$(password) DBNAME=$(database) go test -v -count=1 ./...)
 
 psqlconnect: 
-	psql -h 0.0.0.0 -p 5432 -U postgres -d postgres
+	psql -h 0.0.0.0 -p 5432 -U postgres -d postgres -W password 

@@ -4,7 +4,43 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 )
+
+func Getdb() (*sql.DB, error) {
+	host, ok := os.LookupEnv("HOST")
+	if !ok {
+		return nil, fmt.Errorf("missing HOST env")
+	}
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		return nil, fmt.Errorf("missing PORT env")
+
+	}
+
+	user, ok := os.LookupEnv("USER")
+	if !ok {
+		return nil, fmt.Errorf("missing USER env")
+
+	}
+
+	password, ok := os.LookupEnv("PASSWORD")
+	if !ok {
+		return nil, fmt.Errorf("missing PASSWORD env")
+
+	}
+
+	dbname, ok := os.LookupEnv("DBNAME")
+	if !ok {
+		return nil, fmt.Errorf("missing DBNAME env")
+
+	}
+
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	return sql.Open("postgres", psqlInfo)
+}
 
 type Service interface {
 	DeQueue(context.Context, int) ([]QueueValue, error)
@@ -135,24 +171,6 @@ func (s *service) RollBack(tx *sql.Tx) error {
 }
 
 func (s *service) DeQueueLockTx(ctx context.Context, tx *sql.Tx, nbr int) ([]QueueValue, error) {
-
-	// We can remove the transaction within here
-	// since we will handle that with golang.
-
-	// Need to figure out how to tell it when to commit the lock
-	// have to use some type of channel and go routine for it I guess or
-	// it have to be moved back to the grcp service so it can hold the lock in there.
-	// Think I will stick with creating a new contect with Done and then
-	// check the done for releasing the lock.
-
-	// Split the delete statement out
-	// We controll our stuff as two thing
-	// One select query
-	// and one delete query
-	// will still be in the same transaction.
-	// Pass in the ids that we wish to delete
-	// This should be fine, continue tomorrow with it.
-
 	dequeueQuery := fmt.Sprintf("SELECT * FROM events LIMIT %d FOR UPDATE SKIP LOCKED", nbr)
 	res, err := tx.QueryContext(ctx, dequeueQuery)
 
@@ -185,6 +203,7 @@ func (s *service) DeQueueLockTx(ctx context.Context, tx *sql.Tx, nbr int) ([]Que
 	DELETE FROM
 		events
 	WHERE events.key IN %s`, in)
+	fmt.Println("query: ", delQuery)
 	_, err = tx.ExecContext(ctx, delQuery)
 	if err != nil {
 		return nil, err

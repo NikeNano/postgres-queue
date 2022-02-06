@@ -17,4 +17,5 @@ message Key{
 service QueueService {
     rpc GetValues(Key) returns (Value) {}
     rpc PutValue(Value) returns (Key) {}
+    rpc GetValuesTx (stream Key) returns (stream Value) {}
 }
