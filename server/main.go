@@ -26,19 +26,6 @@ func run() error {
 		return fmt.Errorf("failed to listen on %s: %w", listenOn, err)
 	}
 
-	// psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-	// 	"password=%s dbname=%s sslmode=disable",
-	// 	host, port, user, password, dbname)
-	// db, err := sql.Open("postgres", psqlInfo)
-	// if err != nil {
-	// 	return err
-	// }
-	// defer db.Close()
-
-	// if err := db.Ping(); err != nil {
-	// 	return err
-	// }
-
 	server := grpc.NewServer()
 	queuev1.RegisterQueueServiceServer(server, &queueServiceServer{dbService: postgress.NewService(nil)})
 	log.Println("Listening on", listenOn)
